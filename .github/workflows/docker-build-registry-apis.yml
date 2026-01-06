@@ -1,4 +1,4 @@
-name: OpenG2P Registry Gen2 APIs Dockers
+name: OpenG2P Registry APIs Dockers
 
 on:
   workflow_dispatch: {}
