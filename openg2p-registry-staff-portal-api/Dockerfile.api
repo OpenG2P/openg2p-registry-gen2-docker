@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir git+https://github.com/openg2p/openg2p-fastapi-co
 # Always from openg2p-g2p-bridge repo (no local installs)
 RUN pip install --no-cache-dir \
     "git+https://github.com/openg2p/openg2p-registry-gen2-core@${G2P_REF}#subdirectory=openg2p-registry-core" \
-    "git+https://github.com/openg2p/openg2p-registry-gen2-apis@${G2P_REF}#subdirectory=openg2p-registry-staff-portal-api"
+    "git+https://github.com/tahzeer/openg2p-registry-gen2-apis@${G2P_REF}#subdirectory=openg2p-registry-staff-portal-api"
 
 RUN apk del --no-network .build-deps
 
