@@ -14,8 +14,8 @@ RUN pip install --upgrade pip setuptools && \
         git+https://github.com/openg2p/openg2p-fastapi-common@v1.1.4\#subdirectory=openg2p-fastapi-common  \
         git+https://github.com/openg2p/openg2p-fastapi-common@v1.1.4\#subdirectory=openg2p-fastapi-auth \
         git+https://github.com/openg2p/openg2p-g2pconnect-common-lib@v2.0.0\#subdirectory=openg2p-g2pconnect-common-lib \
-        "git+https://github.com/openg2p/openg2p-registry-core@${G2P_REF}#subdirectory=openg2p-registry-core" \
-        "git+https://github.com/openg2p/openg2p-registry-celery@${G2P_REF}#subdirectory=openg2p-registry-celery-beat-producers"
+        "git+https://github.com/openg2p/openg2p-registry-gen2-core@${G2P_REF}#subdirectory=openg2p-registry-core" \
+        "git+https://github.com/openg2p/openg2p-registry-gen2-celery@${G2P_REF}#subdirectory=openg2p-registry-celery-beat-producers"
 
 # Clean up build dependencies early to reduce image size
 RUN apk del --no-network .build-deps

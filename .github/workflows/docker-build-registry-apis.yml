@@ -13,8 +13,10 @@ jobs:
         include:
           - name: staff-portal-api
             serviceFile: openg2p-registry-staff-portal-api/staff-portal-api.txt
-          # - openg2p-registry-partner-api/partner-api.txt
-          # - openg2p-registry-bene-portal-api/bene-portal-api.txt
+          # - name: partner-api
+          #   serviceFile: openg2p-registry-partner-api/partner-api.txt
+          # - name: bene-portal-api
+          #   serviceFile: openg2p-registry-bene-portal-api/bene-portal-api.txt
 
     steps:
       - uses: actions/checkout@v4
