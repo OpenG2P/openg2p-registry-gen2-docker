@@ -6,11 +6,13 @@ on:
 jobs:
   docker-build:
     runs-on: ubuntu-latest
+    name: Docker - ${{ matrix.name }}
     strategy:
       fail-fast: false
       matrix:
-        serviceFile:
-          - openg2p-registry-staff-portal-api/staff-portal-api.txt
+        include:
+          - name: staff-portal-api
+            serviceFile: openg2p-registry-staff-portal-api/staff-portal-api.txt
           # - openg2p-registry-partner-api/partner-api.txt
           # - openg2p-registry-bene-portal-api/bene-portal-api.txt
 
@@ -47,7 +49,7 @@ jobs:
           echo "== Builder info =="
           docker buildx ls || true
 
-      - name: Read service file and prepare adapters requirements
+      - name: Read service file and prepare adapters requirements - ${{ matrix.name }}
         id: read
         shell: bash
         run: |
@@ -113,7 +115,7 @@ jobs:
           cat adapters.requirements.txt || true
           echo "----------------------------------"
 
-      - name: Build and push
+      - name: Build and push - ${{ matrix.name }}
         uses: docker/build-push-action@v6
         with:
           context: ${{ steps.read.outputs.context }}
@@ -130,3 +132,4 @@ jobs:
             org.opencontainers.image.vendor=${{ steps.read.outputs.vendor }}
             org.opencontainers.image.title=${{ steps.read.outputs.title }}
             org.opencontainers.image.description=OpenG2P Registry Gen2 service image
+            org.openg2p.service.name=${{ matrix.name }}
