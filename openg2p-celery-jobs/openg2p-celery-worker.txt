@@ -1,4 +1,0 @@
-# openg2p-celery-worker.txt
-#!openg2p/openg2p-celery-workers:develop
-#!openg2p-celery-jobs/Dockerfile.workers
-#!.

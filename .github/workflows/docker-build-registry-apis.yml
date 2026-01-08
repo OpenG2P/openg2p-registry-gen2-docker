@@ -1,4 +1,4 @@
-name: OpenG2P Registry Celery Dockers
+name: OpenG2P Registry APIs Dockers
 
 on:
   workflow_dispatch: {}
@@ -11,10 +11,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: registry-celery-beat-producers
-            serviceFile: openg2p-registry-celery/registry-celery-beat.txt
-          - name: registry-celery-workers
-            serviceFile: openg2p-registry-celery/registry-celery-worker.txt
+          - name: staff-portal-api
+            serviceFile: openg2p-registry-staff-portal-api/staff-portal-api.txt
+          # - name: partner-api
+          #   serviceFile: openg2p-registry-partner-api/partner-api.txt
+          # - name: bene-portal-api
+          #   serviceFile: openg2p-registry-bene-portal-api/bene-portal-api.txt
 
     steps:
       - uses: actions/checkout@v4
