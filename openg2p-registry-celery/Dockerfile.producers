@@ -11,7 +11,7 @@ WORKDIR /app
 # Use --parallel-builds for faster git cloning and building
 RUN pip install --upgrade pip setuptools && \
     pip install --disable-pip-version-check \
-        git+https://github.com/openg2p/openg2p-fastapi-common@v1.1.4\#subdirectory=openg2p-fastapi-common  \
+        git+https://github.com/openg2p/openg2p-fastapi-common@1.1\#subdirectory=openg2p-fastapi-common  \
         git+https://github.com/openg2p/openg2p-fastapi-common@v1.1.4\#subdirectory=openg2p-fastapi-auth \
         git+https://github.com/openg2p/openg2p-g2pconnect-common-lib@v2.0.0\#subdirectory=openg2p-g2pconnect-common-lib \
         "git+https://github.com/openg2p/openg2p-registry-gen2-core@${G2P_REF}#subdirectory=openg2p-registry-core" \
