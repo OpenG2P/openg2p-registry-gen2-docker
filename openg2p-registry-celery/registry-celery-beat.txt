@@ -1,4 +1,4 @@
 # registry-celery-beat.txt
-#!tahzeer/openg2p-registry-celery-beat-producers:develop
+#!tahzeer/openg2p-registry-celery-beat-producers:family
 #!openg2p-registry-celery/Dockerfile.producers
 #!.
