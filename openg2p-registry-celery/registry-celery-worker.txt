@@ -1,6 +1,6 @@
 # registry-celery-worker.txt
-#!openg2p/openg2p-registry-celery-workers:develop
+#!tahzeer/openg2p-registry-celery-workers:develop
 #!openg2p-registry-celery/Dockerfile.workers
 #!.
 # adapters/dependencies (adjust refs/branches/tags as needed)
-git+https://github.com/openg2p/openg2p-registry-gen2-extensions@develop#subdirectory=openg2p-registry-extensions
+git+https://github.com/openg2p/openg2p-registry-gen2-extensions@develop#subdirectory=openg2p-registry-farmer-extension
