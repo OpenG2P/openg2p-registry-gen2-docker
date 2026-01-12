@@ -17,10 +17,10 @@ RUN pip install --no-cache-dir git+https://github.com/openg2p/openg2p-fastapi-co
  && pip install --no-cache-dir git+https://github.com/openg2p/openg2p-g2pconnect-common-lib@v2.0.0\#subdirectory=openg2p-g2pconnect-common-lib \
  && pip install --no-cache-dir git+https://github.com/openg2p/openg2p-g2pconnect-common-lib@v2.0.0\#subdirectory=openg2p-g2pconnect-mapper-lib
 
-# Always from openg2p-g2p-bridge repo (no local installs)
+# Always from openg2p-registry-gen2 repo (no local installs)
 RUN pip install --no-cache-dir \
-    "git+https://github.com/openg2p/openg2p-registry-core@${G2P_REF}#subdirectory=openg2p-registry-core" \
-    "git+https://github.com/openg2p/openg2p-registry-apis@${G2P_REF}#subdirectory=openg2p-partner-portal-api"
+    "git+https://github.com/openg2p/openg2p-registry-gen2-core@${G2P_REF}#subdirectory=openg2p-registry-core" \
+    "git+https://github.com/openg2p/openg2p-registry-gen2-apis@${G2P_REF}#subdirectory=openg2p-registry-partner-api"
 
 RUN apk del --no-network .build-deps
 
