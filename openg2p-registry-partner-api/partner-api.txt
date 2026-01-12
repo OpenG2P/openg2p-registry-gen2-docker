@@ -2,4 +2,4 @@
 #!tahzeer/openg2p-registry-partner-api:family
 #!openg2p-registry-partner-api/Dockerfile.api
 #!.
-git+https://github.com/openg2p/openg2p-registry-gen2-extensions@develop#subdirectory=openg2p-registry-farmer-extension
+git+https://github.com/openg2p/openg2p-registry-gen2-extensions@develop#subdirectory=openg2p-registry-family-extension
