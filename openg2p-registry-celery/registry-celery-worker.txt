@@ -1,5 +1,5 @@
 # registry-celery-worker.txt
-#!tahzeer/openg2p-registry-celery-workers:develop
+#!tahzeer/openg2p-registry-celery-workers:farmer
 #!openg2p-registry-celery/Dockerfile.workers
 #!.
 # adapters/dependencies (adjust refs/branches/tags as needed)
