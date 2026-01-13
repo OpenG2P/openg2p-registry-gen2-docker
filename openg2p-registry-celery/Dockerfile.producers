@@ -7,6 +7,9 @@ RUN apk add --no-cache --virtual .build-deps gcc libc-dev linux-headers make \
 
 WORKDIR /app
 
+COPY adapters.requirements.txt /tmp/adapters.requirements.txt
+RUN if [ -s /tmp/adapters.requirements.txt ]; then pip install --no-cache-dir -r /tmp/adapters.requirements.txt; fi
+
 # Install all Python packages in one layer for better caching and speed
 # Use --parallel-builds for faster git cloning and building
 RUN pip install --upgrade pip setuptools && \
