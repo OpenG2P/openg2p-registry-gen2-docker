@@ -1,0 +1,133 @@
+name: OpenG2P Registry Core UI Dockers
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    name: Docker - ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: registry-core-ui
+            serviceFile: openg2p-registry-core-ui/registry-core-ui.txt
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.docker_hub_actor }}
+          password: ${{ secrets.docker_hub_token }}
+
+      - name: Diagnostics (token envs, docker, proxy, buildx)
+        shell: bash
+        run: |
+          echo "== GH Actions runtime token envs (masked) =="
+          env | sort | grep -E '^(ACTIONS_|GITHUB_|RUNNER_)' || true
+          echo
+          echo "== Proxy configuration =="
+          env | sort | grep -E '^(HTTP|http|HTTPS|https|NO|no)_PROXY=' || true
+          echo
+          echo "== Docker info =="
+          docker info || true
+          echo
+          echo "== Buildx version =="
+          docker buildx version || true
+          echo
+          echo "== Builder info =="
+          docker buildx ls || true
+
+      - name: Read service file and prepare adapters requirements - ${{ matrix.name }}
+        id: read
+        shell: bash
+        run: |
+          set -euo pipefail
+          file="${{ matrix.serviceFile }}"
+          [ -f "$file" ] || { echo "Service file not found: $file" >&2; exit 1; }
+
+          # Collect non-empty, non-comment lines; strip leading '#!' if present
+          mapfile -t LINES < <(awk '
+            {
+              s=$0
+              sub(/^[[:space:]]*#!/,"",s)      # strip leading "#!"
+              if (s ~ /^[[:space:]]*#/) next   # skip comment-only lines like "# header"
+              if (s ~ /^[[:space:]]*$/) next   # skip blank
+              print s
+            }' "$file")
+
+          if [ "${#LINES[@]}" -lt 2 ]; then
+            echo "Invalid file format: need at least IMAGE_ID and DOCKERFILE lines" >&2
+            exit 1
+          fi
+
+          IMAGE_ID="${LINES[0]}"
+          DOCKERFILE="${LINES[1]}"
+          CONTEXT="."
+          if [ "${#LINES[@]}" -ge 3 ] && [ -n "${LINES[2]}" ]; then
+            CONTEXT="${LINES[2]}"
+          fi
+
+          # Remaining lines are optional dependencies
+          : > adapters.requirements.txt
+          if [ "${#LINES[@]}" -gt 3 ]; then
+            printf "%s\n" "${LINES[@]:3}" > adapters.requirements.txt
+          fi
+
+          # Basic sanity checks
+          case "$IMAGE_ID" in
+            *" "*|*"#"*|"") echo "Bad IMAGE_ID: '$IMAGE_ID'" >&2; exit 1;;
+          esac
+          [ -f "$DOCKERFILE" ] || { echo "Dockerfile not found at path: $DOCKERFILE" >&2; exit 1; }
+          [ -d "$CONTEXT" ] || { echo "Build context not found: $CONTEXT" >&2; exit 1; }
+
+          COMMIT_HASH=$(git --no-pager log -1 --pretty=format:%H)
+          CREATED=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          # Derive optional labels safely
+          VENDOR="$(printf "%s" "$IMAGE_ID" | cut -d'/' -f1)"
+          TITLE="$(printf "%s" "$IMAGE_ID" | cut -d'/' -f2 | cut -d':' -f1)"
+          VERSION="$(printf "%s" "$IMAGE_ID" | awk -F: 'NF>1{print $NF} NF==1{print "latest"}')"
+
+          {
+            echo "image=$IMAGE_ID"
+            echo "dockerfile=$DOCKERFILE"
+            echo "context=$CONTEXT"
+            echo "created=$CREATED"
+            echo "commit=$COMMIT_HASH"
+            echo "vendor=$VENDOR"
+            echo "title=$TITLE"
+            echo "version=$VERSION"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "---- adapters.requirements.txt ----"
+          cat adapters.requirements.txt || true
+          echo "----------------------------------"
+
+      - name: Build and push - ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ steps.read.outputs.context }}
+          file: ${{ steps.read.outputs.dockerfile }}
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.read.outputs.image }}
+          labels: |
+            org.opencontainers.image.created=${{ steps.read.outputs.created }}
+            org.opencontainers.image.authors=${{ github.repository_owner }}
+            org.opencontainers.image.source=${{ github.repository }}@${{ steps.read.outputs.commit }}
+            org.opencontainers.image.version=${{ steps.read.outputs.version }}
+            org.opencontainers.image.revision=${{ steps.read.outputs.commit }}
+            org.opencontainers.image.vendor=${{ steps.read.outputs.vendor }}
+            org.opencontainers.image.title=${{ steps.read.outputs.title }}
+            org.opencontainers.image.description=OpenG2P Registry Gen2 service image
+            org.openg2p.service.name=${{ matrix.name }}
