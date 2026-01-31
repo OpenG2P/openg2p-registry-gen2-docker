@@ -1,0 +1,11 @@
+#!openg2p/openg2p-registry-celery:develop
+
+# Dependencies
+fastapi = git://1.1//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-common
+fastapi-auth = git://v1.1.4//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-auth
+g2pconnect-common = git://v2.0.0//https://github.com/openg2p/openg2p-g2pconnect-common-lib#subdirectory=openg2p-g2pconnect-common-lib
+core = git://develop//https://github.com/openg2p/openg2p-registry-gen2-core#subdirectory=openg2p-registry-core
+
+# Celery components - including both so this image can run as worker or beat
+celery-producers = git://develop//https://github.com/openg2p/openg2p-registry-gen2-celery#subdirectory=openg2p-registry-celery-beat-producers
+celery-workers = git://develop//https://github.com/openg2p/openg2p-registry-gen2-celery#subdirectory=openg2p-registry-celery-workers

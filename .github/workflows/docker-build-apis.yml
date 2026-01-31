@@ -50,6 +50,11 @@ jobs:
                   "serviceFile": "staff-portal-api/farmer-develop.txt",
                   "dockerfile": "staff-portal-api/Dockerfile"
               })
+              matrix_include.append({
+                  "name": "celery",
+                  "serviceFile": "openg2p-registry-celery/celery-develop.txt",
+                  "dockerfile": "openg2p-registry-celery/Dockerfile"
+              })
           
           matrix = {"include": matrix_include}
           

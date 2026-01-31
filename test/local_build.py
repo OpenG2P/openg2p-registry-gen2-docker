@@ -77,7 +77,7 @@ def parse_service_file(service_file, override_dockerfile=None):
 
 def main():
     parser = argparse.ArgumentParser(description="Build OpenG2P Docker image locally using spec file.")
-    parser.add_argument("service_file", help="Path to the service spec file (e.g., openg2p-registry-staff-portal-api/farmer-develop.txt)")
+    parser.add_argument("service_file", nargs='?', default="staff-portal-api/farmer-develop.txt", help="Path to the service spec file (default: staff-portal-api/farmer-develop.txt)")
     parser.add_argument("--dockerfile", help="Path to Dockerfile (optional)")
     parser.add_argument("--push", action="store_true", help="Push image to registry after build")
     parser.add_argument("--no-cache", action="store_true", help="Do not use cache when building")
