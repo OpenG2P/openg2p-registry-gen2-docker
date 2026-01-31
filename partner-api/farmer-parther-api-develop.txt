@@ -1,0 +1,8 @@
+#!openg2p/openg2p-registry-partner-api:develop
+a = git://1.1//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-common
+b = git://v1.1.4//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-auth
+c = git://v2.0.0//https://github.com/openg2p/openg2p-g2pconnect-common-lib#subdirectory=openg2p-g2pconnect-common-lib
+d = git://v2.0.0//https://github.com/openg2p/openg2p-g2pconnect-common-lib#subdirectory=openg2p-g2pconnect-mapper-lib
+e = git://develop//https://github.com/openg2p/openg2p-registry-gen2-core#subdirectory=openg2p-registry-core
+d = git://develop//https://github.com/openg2p/openg2p-registry-gen2-extensions#subdirectory=openg2p-registry-farmer-extension
+f = git://develop//https://github.com/openg2p/openg2p-registry-gen2-apis#subdirectory=openg2p-registry-partner-api
