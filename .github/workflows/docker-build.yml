@@ -51,8 +51,8 @@ jobs:
               })
               matrix_include.append({
                   "name": "celery",
-                  "serviceFile": "openg2p-registry-celery/celery-develop.txt",
-                  "dockerfile": "openg2p-registry-celery/Dockerfile"
+                  "serviceFile": "celery/celery-develop.txt",
+                  "dockerfile": "celery/Dockerfile"
               })
           
           matrix = {"include": matrix_include}
