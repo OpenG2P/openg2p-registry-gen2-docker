@@ -1,4 +1,4 @@
-name: OpenG2P Registry APIs Dockers
+name: Build & Push Registry Dockers
 
 on:
   workflow_dispatch:
