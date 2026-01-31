@@ -1,5 +1,0 @@
-# staff-portal-api.txt
-#!openg2p/openg2p-registry-partner-api:develop
-#!openg2p-registry-partner-api/Dockerfile.api
-#!.
-git+https://github.com/openg2p/openg2p-registry-extensions@develop#subdirectory=openg2p-registry-extensions

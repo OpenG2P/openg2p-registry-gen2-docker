@@ -54,6 +54,11 @@ jobs:
                   "serviceFile": "celery/celery-develop.txt",
                   "dockerfile": "celery/Dockerfile"
               })
+              matrix_include.append({
+                  "name": "partner-api",
+                  "serviceFile": "partner-api/partner-api-develop.txt",
+                  "dockerfile": "partner-api/Dockerfile"
+              })
           
           matrix = {"include": matrix_include}
           
