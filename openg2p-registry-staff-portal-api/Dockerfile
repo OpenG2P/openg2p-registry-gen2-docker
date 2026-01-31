@@ -1,26 +1,13 @@
 FROM python:3.12.11-alpine3.22
 
-ARG G2P_REF=develop
-
 RUN apk add --no-cache --virtual .build-deps gcc libc-dev linux-headers make \
  && apk add --no-cache bash git gettext libpq-dev libmagic
 
 WORKDIR /app
 
-# Dynamic deps from workflow (optional)
-COPY adapters.requirements.txt /tmp/adapters.requirements.txt
-RUN if [ -s /tmp/adapters.requirements.txt ]; then pip install --no-cache-dir -r /tmp/adapters.requirements.txt; fi
-
-# Core libs (as in your current API Dockerfile)
-RUN pip install --no-cache-dir git+https://github.com/openg2p/openg2p-fastapi-common@1.1\#subdirectory=openg2p-fastapi-common  \
- && pip install --no-cache-dir git+https://github.com/openg2p/openg2p-fastapi-common@v1.1.4\#subdirectory=openg2p-fastapi-auth \
- && pip install --no-cache-dir git+https://github.com/openg2p/openg2p-g2pconnect-common-lib@v2.0.0\#subdirectory=openg2p-g2pconnect-common-lib \
- && pip install --no-cache-dir git+https://github.com/openg2p/openg2p-g2pconnect-common-lib@v2.0.0\#subdirectory=openg2p-g2pconnect-mapper-lib
-
-# Always from openg2p-g2p-bridge repo (no local installs)
-RUN pip install --no-cache-dir \
-    "git+https://github.com/openg2p/openg2p-registry-gen2-core@${G2P_REF}#subdirectory=openg2p-registry-core" \
-    "git+https://github.com/openg2p/openg2p-registry-gen2-apis@${G2P_REF}#subdirectory=openg2p-registry-staff-portal-api"
+# Install dependencies from the generated requirements file
+COPY adapters.requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 RUN apk del --no-network .build-deps
 
