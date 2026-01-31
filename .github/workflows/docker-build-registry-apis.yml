@@ -87,12 +87,24 @@ jobs:
           
           # Dockerfile resolution
           dockerfile = matrix_dockerfile
+          if not dockerfile:
+              # Default to Dockerfile in the same directory as service_file
+              service_dir = os.path.dirname(service_file)
+              candidate = os.path.join(service_dir, 'Dockerfile')
+              # We can't check if it exists here because we haven't checked out the code yet in the setup job,
+              # but this script runs in the build job where code IS checked out.
+              # So checking existence is good practice.
+              if os.path.exists(candidate):
+                  dockerfile = candidate
+          
           # Fallback to legacy check: line 2 starts with #!
           if not dockerfile and len(lines) > 1 and lines[1].startswith('#!'):
               dockerfile = lines[1].lstrip('#!').strip()
           
           if not dockerfile:
-              print("Dockerfile path not found in matrix or service file.", file=sys.stderr)
+              # Final attempt: assume Dockerfile in current dir if service file has no path? 
+              # Or just fail.
+              print(f"Dockerfile path not found. Checked matrix input, same dir as {service_file}, and file header.", file=sys.stderr)
               sys.exit(1)
 
           # Parse dependencies
