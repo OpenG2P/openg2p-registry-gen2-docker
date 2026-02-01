@@ -53,10 +53,7 @@ def parse_service_file(service_file, override_dockerfile=None):
         if line.startswith('#!'): continue
         if line.startswith('#'): continue
         
-        # Handle key = value
-        val = line
-        if '=' in line:
-            val = line.split('=', 1)[1].strip()
+        val = line.strip()
         
         # Parse git://TAG//URL
         m = re.match(r'git://([^/]+)//(.+)', val)
