@@ -31,7 +31,7 @@ jobs:
 
           service_file = os.environ.get('INPUT_SERVICE_FILE', '').strip()
           dockerfile = os.environ.get('INPUT_DOCKERFILE', '').strip()
-          
+
           matrix_include = []
 
           if service_file:
@@ -59,9 +59,9 @@ jobs:
                   "serviceFile": "partner-api/partner-api-develop.txt",
                   "dockerfile": "partner-api/Dockerfile"
               })
-          
+
           matrix = {"include": matrix_include}
-          
+
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
               f.write(f"matrix={json.dumps(matrix)}\n")
 
@@ -121,7 +121,7 @@ jobs:
 
           service_file = os.environ['SERVICE_FILE']
           matrix_dockerfile = os.environ.get('MATRIX_DOCKERFILE', '')
-          
+
           if not os.path.exists(service_file):
               print(f"Service file not found: {service_file}", file=sys.stderr)
               sys.exit(1)
@@ -135,7 +135,7 @@ jobs:
 
           # Line 1: Image ID
           image_id = lines[0].lstrip('#!').strip()
-          
+
           # Dockerfile resolution
           dockerfile = matrix_dockerfile
           if not dockerfile:
@@ -147,13 +147,13 @@ jobs:
               # So checking existence is good practice.
               if os.path.exists(candidate):
                   dockerfile = candidate
-          
+
           # Fallback to legacy check: line 2 starts with #!
           if not dockerfile and len(lines) > 1 and lines[1].startswith('#!'):
               dockerfile = lines[1].lstrip('#!').strip()
-          
+
           if not dockerfile:
-              # Final attempt: assume Dockerfile in current dir if service file has no path? 
+              # Final attempt: assume Dockerfile in current dir if service file has no path?
               # Or just fail.
               print(f"Dockerfile path not found. Checked matrix input, same dir as {service_file}, and file header.", file=sys.stderr)
               sys.exit(1)
@@ -163,9 +163,9 @@ jobs:
           for line in lines:
               if line.startswith('#!'): continue
               if line.startswith('#'): continue
-              
+
               val = line.strip()
-              
+
               # Parse git://TAG//URL
               m = re.match(r'git://([^/]+)//(.+)', val)
               if m:
@@ -184,7 +184,7 @@ jobs:
           # Write requirements file
           with open('adapters.requirements.txt', 'w') as f:
               f.write('\n'.join(deps))
-          
+
           print("---- adapters.requirements.txt ----")
           print('\n'.join(deps))
           print("----------------------------------")
@@ -194,7 +194,7 @@ jobs:
               commit_hash = subprocess.check_output(['git', '--no-pager', 'log', '-1', '--pretty=format:%H']).decode('utf-8').strip()
           except:
               commit_hash = "unknown"
-              
+
           created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
           # Labels

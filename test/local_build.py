@@ -25,7 +25,7 @@ def parse_service_file(service_file, override_dockerfile=None):
 
     # Dockerfile resolution
     dockerfile = override_dockerfile
-    
+
     # 1. Look for Dockerfile in same directory as service file
     if not dockerfile:
         service_dir = os.path.dirname(service_file)
@@ -36,7 +36,7 @@ def parse_service_file(service_file, override_dockerfile=None):
     # 2. Legacy check: line 2 starts with #!
     if not dockerfile and len(lines) > 1 and lines[1].startswith('#!'):
         dockerfile = lines[1].lstrip('#!').strip()
-    
+
     if not dockerfile:
         # Fallback to just "Dockerfile" in current dir
         if os.path.exists("Dockerfile"):
@@ -44,7 +44,7 @@ def parse_service_file(service_file, override_dockerfile=None):
         else:
             print("Error: Dockerfile path could not be determined.", file=sys.stderr)
             sys.exit(1)
-            
+
     print(f"Using Dockerfile: {dockerfile}")
 
     # Parse dependencies
@@ -52,9 +52,9 @@ def parse_service_file(service_file, override_dockerfile=None):
     for line in lines:
         if line.startswith('#!'): continue
         if line.startswith('#'): continue
-        
+
         val = line.strip()
-        
+
         # Parse git://TAG//URL
         m = re.match(r'git://([^/]+)//(.+)', val)
         if m:
@@ -87,7 +87,7 @@ def main():
     req_file = "adapters.requirements.txt"
     with open(req_file, 'w') as f:
         f.write('\n'.join(deps))
-    
+
     print(f"\nGenerated {req_file}:")
     print('\n'.join(deps))
     print("-" * 30)
@@ -97,16 +97,16 @@ def main():
         commit_hash = subprocess.check_output(['git', '--no-pager', 'log', '-1', '--pretty=format:%H']).decode('utf-8').strip()
     except:
         commit_hash = "unknown"
-        
+
     created = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    
+
     # Labels
     vendor = image_id.split('/')[0] if '/' in image_id else "unknown"
     try:
         title = image_id.split('/')[1].split(':')[0]
     except:
         title = image_id
-    
+
     version = "latest"
     if ':' in image_id:
         version = image_id.split(':')[-1]
@@ -128,7 +128,7 @@ def main():
         cmd.insert(2, "--no-cache")
 
     print(f"\nRunning build command:\n{' '.join(cmd)}\n")
-    
+
     try:
         subprocess.check_call(cmd)
         print(f"\n✅ Build successful! Image: {image_id}")

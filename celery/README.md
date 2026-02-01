@@ -18,4 +18,3 @@ Override the variables to point to the producer app and enable the beat flag.
 
 CELERY_APP: openg2p_registry_celery_beat_producers.main.celery_app
 CELERY_OPTS: worker --beat --loglevel=info --schedule=/tmp/celery-beat-schedule.db
-
