@@ -16,7 +16,7 @@ ENV CELERY_APP=openg2p_registry_celery_workers.main.celery_app
 ENV CELERY_OPTS="worker --loglevel=info"
 ENV CELERY_IMPORTS=""
 
-COPY celery/run_celery.py /app/run_celery.py
+COPY run_celery.py /app/run_celery.py
 
 # Always use the python wrapper to handle imports and startup
 CMD ["python3", "/app/run_celery.py"]
