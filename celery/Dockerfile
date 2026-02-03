@@ -16,11 +16,7 @@ ENV CELERY_APP=openg2p_registry_celery_workers.main.celery_app
 ENV CELERY_OPTS="worker --loglevel=info"
 ENV CELERY_IMPORTS=""
 
-# Default command uses env vars to allow flexibility (worker vs beat)
-CMD if [ -n "$CELERY_IMPORTS" ]; then \
-        echo "Running: celery -A ${CELERY_APP} --include ${CELERY_IMPORTS} ${CELERY_OPTS}"; \
-        celery -A ${CELERY_APP} --include "${CELERY_IMPORTS}" ${CELERY_OPTS}; \
-    else \
-        echo "Running: celery -A ${CELERY_APP} ${CELERY_OPTS}"; \
-        celery -A ${CELERY_APP} ${CELERY_OPTS}; \
-    fi
+COPY celery/run_celery.py /app/run_celery.py
+
+# Always use the python wrapper to handle imports and startup
+CMD ["python3", "/app/run_celery.py"]
