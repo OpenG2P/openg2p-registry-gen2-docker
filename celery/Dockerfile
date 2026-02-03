@@ -14,6 +14,11 @@ RUN apk del --no-network .build-deps
 ENV PYTHONUNBUFFERED=1
 ENV CELERY_APP=openg2p_registry_celery_workers.main.celery_app
 ENV CELERY_OPTS="worker --loglevel=info"
+ENV CELERY_IMPORTS=""
 
 # Default command uses env vars to allow flexibility (worker vs beat)
-CMD celery -A ${CELERY_APP} ${CELERY_OPTS}
+CMD if [ -n "$CELERY_IMPORTS" ]; then \
+        celery -A ${CELERY_APP} ${CELERY_OPTS} --imports "${CELERY_IMPORTS}"; \
+    else \
+        celery -A ${CELERY_APP} ${CELERY_OPTS}; \
+    fi
