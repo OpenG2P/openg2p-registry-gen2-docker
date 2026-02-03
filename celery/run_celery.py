@@ -38,22 +38,14 @@ def main():
     opts = os.environ.get("CELERY_OPTS", "worker --loglevel=info").split()
     print(f"Starting Celery with options: {opts}")
     
-    # Update sys.argv so click picks it up correctly
-    # We use 'celery' as the program name
-    sys.argv = ["celery"] + opts
-    
+    # celery_app.start(argv=...) passes arguments to click.
+    # Click expects the first argument to be the subcommand (e.g. 'worker').
+    # We do NOT pass the program name 'celery' here.
     try:
-        celery_app.start()
+        celery_app.start(argv=opts)
     except Exception as e:
-        # Fallback for some versions or specific error cases
         print(f"Error starting via app.start(): {e}")
-        if opts[0] == 'worker':
-            print("Attempting fallback to worker_main...")
-            # worker_main expects sys.argv style, so ['worker', ...] might be needed
-            # usually program name is first, so ['celery', 'worker', ...]
-            celery_app.worker_main(argv=sys.argv)
-        else:
-            raise
+        raise
 
 if __name__ == "__main__":
     main()
