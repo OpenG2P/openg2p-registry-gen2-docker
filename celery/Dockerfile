@@ -18,7 +18,7 @@ ENV CELERY_IMPORTS=""
 
 # Default command uses env vars to allow flexibility (worker vs beat)
 CMD if [ -n "$CELERY_IMPORTS" ]; then \
-        celery -A ${CELERY_APP} ${CELERY_OPTS} --imports "${CELERY_IMPORTS}"; \
+        celery -A ${CELERY_APP} --imports "${CELERY_IMPORTS}" ${CELERY_OPTS}; \
     else \
         celery -A ${CELERY_APP} ${CELERY_OPTS}; \
     fi
