@@ -59,6 +59,11 @@ jobs:
                   "serviceFile": "partner-api/partner-api-develop.txt",
                   "dockerfile": "partner-api/Dockerfile"
               })
+              matrix_include.append({
+                  "name": "staff-portal-ui",
+                  "serviceFile": "staff-portal-ui/develop.txt",
+                  "dockerfile": "staff-portal-ui/Dockerfile"
+              })
 
           matrix = {"include": matrix_include}
 
@@ -160,6 +165,9 @@ jobs:
 
           # Parse dependencies
           deps = []
+          repo_url = ""
+          git_branch = ""
+          
           for line in lines:
               if line.startswith('#!'): continue
               if line.startswith('#'): continue
@@ -171,6 +179,10 @@ jobs:
               if m:
                   tag = m.group(1)
                   url_full = m.group(2)
+                  if not repo_url:
+                      repo_url = url_full
+                      git_branch = tag
+                      
                   if '#' in url_full:
                       base, frag = url_full.split('#', 1)
                       req = f"git+{base}@{tag}#{frag}"
@@ -221,6 +233,8 @@ jobs:
                   f.write(f"vendor={vendor}\n")
                   f.write(f"title={title}\n")
                   f.write(f"version={version}\n")
+                  f.write(f"repo_url={repo_url}\n")
+                  f.write(f"git_branch={git_branch}\n")
 
       - name: Build and push - ${{ matrix.name }}
         uses: docker/build-push-action@v6
@@ -230,6 +244,9 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.read.outputs.image }}
+          build-args: |
+            REPO_URL=${{ steps.read.outputs.repo_url }}
+            GIT_BRANCH=${{ steps.read.outputs.git_branch }}
           labels: |
             org.opencontainers.image.created=${{ steps.read.outputs.created }}
             org.opencontainers.image.authors=${{ github.repository_owner }}

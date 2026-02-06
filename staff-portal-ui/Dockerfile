@@ -4,7 +4,7 @@ WORKDIR /app
 FROM base AS builder
 
 RUN apk add --no-cache git
-ARG REPO_URL=https://github.com/OpenG2P/openg2p-registry-staff-portal-ui.git
+ARG REPO_URL=https://github.com/openg2p/openg2p-registry-staff-portal-ui
 ARG GIT_BRANCH=develop
 RUN git clone --branch ${GIT_BRANCH} --depth 1 ${REPO_URL} .
 
