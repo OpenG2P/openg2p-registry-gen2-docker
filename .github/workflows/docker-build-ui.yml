@@ -12,7 +12,7 @@ jobs:
       matrix:
         include:
           - name: registry-core-ui
-            serviceFile: openg2p-registry-core-ui/registry-core-ui.txt
+            serviceFile: staff-portal-ui/registry-core-ui.txt
 
     steps:
       - uses: actions/checkout@v4
