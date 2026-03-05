@@ -1,4 +1,4 @@
-name: Build & Push Registry Dockers
+name: Build & Push Backend Dockers
 
 on:
   workflow_dispatch:

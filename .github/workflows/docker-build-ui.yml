@@ -1,4 +1,4 @@
-name: OpenG2P Registry Core UI Dockers
+name: Build & Push UI Dockers
 
 on:
   workflow_dispatch: {}
