@@ -12,7 +12,7 @@
 #   ./build.sh --dockerfile staff-portal-api/Dockerfile staff-portal-api/farmer-develop.txt
 #   ./build.sh --platform linux/amd64 --push all
 #
-# Required env vars (set in .env or export before running):
+# Required env vars (set in scripts/.env or export before running):
 #   DOCKER_HUB_USERNAME   — Docker Hub username
 #   DOCKER_HUB_TOKEN      — Docker Hub access token / password
 #
@@ -56,6 +56,12 @@ usage() {
   exit 0
 }
 
+cleanup() {
+  rm -f  "${SCRIPT_DIR}/_service_env.sh"
+  rm -rf "${REPO_ROOT}/local_deps"
+  rm -f  "${REPO_ROOT}/adapters.requirements.txt"
+}
+
 # ---------------------------------------------------------------------------
 # Argument parsing
 # ---------------------------------------------------------------------------
@@ -83,7 +89,6 @@ fi
 # Credential check
 # ---------------------------------------------------------------------------
 if [[ "${PUSH}" == "1" ]]; then
-  # Load .env if present
   ENV_FILE="${SCRIPT_DIR}/.env"
   if [[ -f "${ENV_FILE}" ]]; then
     log "Loading credentials from ${ENV_FILE}"
@@ -128,7 +133,8 @@ for SERVICE_FILE in "${SERVICE_FILES[@]}"; do
   log "Processing service file: ${SERVICE_FILE}"
   log "============================================================"
 
-  # Run the Python parse+build helper (mirrors the workflow's Python step)
+  # Parse the service file. For local-path deps this also copies source trees
+  # into <repo_root>/local_deps/ so they are inside the Docker build context.
   python3 "${SCRIPT_DIR}/parse_service.py" \
     --service-file "${SERVICE_FILE}" \
     --repo-root    "${REPO_ROOT}" \
@@ -143,6 +149,11 @@ for SERVICE_FILE in "${SERVICE_FILES[@]}"; do
   log "Context    : ${SVC_CONTEXT}"
   log "REPO_URL   : ${SVC_REPO_URL}"
   log "GIT_BRANCH : ${SVC_GIT_BRANCH}"
+
+  if [[ -d "${REPO_ROOT}/local_deps" ]]; then
+    log "Local deps staged into build context:"
+    ls "${REPO_ROOT}/local_deps/" | sed 's/^/    /'
+  fi
 
   log "Generated adapters.requirements.txt:"
   cat "${REPO_ROOT}/adapters.requirements.txt"
@@ -165,7 +176,6 @@ for SERVICE_FILE in "${SERVICE_FILES[@]}"; do
   [[ "${NO_CACHE}" == "1" ]] && BUILD_ARGS+=(--no-cache)
 
   if [[ "${BUILDX}" == "1" ]]; then
-    # buildx build with multi-platform
     PUSH_FLAG="--load"
     [[ "${PUSH}" == "1" ]] && PUSH_FLAG="--push"
     log "Running: docker buildx build --platform ${BUILD_PLATFORM} ${PUSH_FLAG} ..."
@@ -180,7 +190,6 @@ for SERVICE_FILE in "${SERVICE_FILES[@]}"; do
       FAILURES+=("${SVC_IMAGE}")
     fi
   else
-    # Standard docker build
     log "Running: docker build ..."
     if docker build "${BUILD_ARGS[@]}" "${SVC_CONTEXT}"; then
       log "✅ Build succeeded: ${SVC_IMAGE}"
@@ -194,8 +203,8 @@ for SERVICE_FILE in "${SERVICE_FILES[@]}"; do
     fi
   fi
 
-  # Cleanup temp env file
-  rm -f "${SCRIPT_DIR}/_service_env.sh"
+  # Clean up per-build artifacts (local_deps, requirements, temp env)
+  cleanup
 done
 
 # ---------------------------------------------------------------------------
