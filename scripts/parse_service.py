@@ -19,6 +19,10 @@ Supports two dependency syntaxes in the service spec file:
     ./local_deps/<dir_name>
   so pip installs it from the local source tree rather than fetching from GitHub.
 
+  local_deps/ is committed to git (with a .gitkeep placeholder) so that the
+  Dockerfiles can unconditionally COPY it in both local and GitHub Actions builds.
+  This script only writes into local_deps/ — it never deletes the directory itself.
+
 Usage (called by build.sh, but can also be run directly):
     python3 parse_service.py \\
         --service-file staff-portal-api/farmer-develop.txt \\
@@ -65,13 +69,31 @@ def _resolve_local_dep(val: str, repo_root: str) -> tuple[str, str]:
         print(f"ERROR: Local dependency path does not exist: {src}", file=sys.stderr)
         sys.exit(1)
 
-    # Always refresh the copy so stale files don't sneak in
+    # Refresh only this package's subdirectory — never touch .gitkeep or other entries
     if os.path.exists(dest):
         shutil.rmtree(dest)
     print(f"  [local] Copying {src}  →  local_deps/{pkg_name}/")
     shutil.copytree(src, dest)
 
     return f"./local_deps/{pkg_name}", pkg_name
+
+
+def _clean_stale_local_deps(repo_root: str, current_pkgs: list[str]):
+    """
+    Remove any subdirectories from local_deps/ that are not in current_pkgs.
+    This clears leftovers from a previous build without touching .gitkeep.
+    """
+    local_deps_root = os.path.join(repo_root, "local_deps")
+    if not os.path.exists(local_deps_root):
+        return
+    for entry in os.listdir(local_deps_root):
+        if entry == ".gitkeep":
+            continue
+        if entry not in current_pkgs:
+            stale = os.path.join(local_deps_root, entry)
+            if os.path.isdir(stale):
+                shutil.rmtree(stale)
+                print(f"  [local] Removed stale local_deps/{entry}/")
 
 
 # ---------------------------------------------------------------------------
@@ -120,17 +142,10 @@ def parse_service_file(service_file: str, override_dockerfile: str | None, repo_
         sys.exit(1)
 
     # -----------------------------------------------------------------------
-    # Wipe local_deps from any previous run so nothing stale carries over
-    # -----------------------------------------------------------------------
-    local_deps_root = os.path.join(repo_root, "local_deps")
-    if os.path.exists(local_deps_root):
-        shutil.rmtree(local_deps_root)
-
-    # -----------------------------------------------------------------------
     # Dependency / git line parsing
     # -----------------------------------------------------------------------
     deps = []        # lines written to adapters.requirements.txt
-    local_pkgs = []  # package names sourced locally (for logging)
+    local_pkgs = []  # package names sourced locally (for stale-cleanup + logging)
     repo_url = ""
     git_branch = ""
 
@@ -173,6 +188,9 @@ def parse_service_file(service_file: str, override_dockerfile: str | None, repo_
         # ------------------------------------------------------------------
         deps.append(val)
 
+    # Remove any leftover subdirs from a previous build that aren't needed now
+    _clean_stale_local_deps(repo_root, local_pkgs)
+
     # -----------------------------------------------------------------------
     # Write adapters.requirements.txt into repo root (Dockerfiles COPY it)
     # -----------------------------------------------------------------------
@@ -187,6 +205,8 @@ def parse_service_file(service_file: str, override_dockerfile: str | None, repo_
     print("-----------------------------------")
     if local_pkgs:
         print(f"Local packages staged into local_deps/: {', '.join(local_pkgs)}")
+    else:
+        print("No local packages — local_deps/ is empty (remote-only build).")
 
     # -----------------------------------------------------------------------
     # Git metadata for OCI labels

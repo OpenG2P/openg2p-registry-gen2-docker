@@ -5,6 +5,9 @@ RUN apk add --no-cache --virtual .build-deps gcc libc-dev linux-headers make \
 
 WORKDIR /app
 
+# Copy local package sources (may be empty for remote-only builds)
+COPY local_deps/ /app/local_deps/
+
 # Install dependencies from the generated requirements file
 COPY adapters.requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
