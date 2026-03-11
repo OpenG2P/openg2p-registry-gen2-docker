@@ -57,9 +57,12 @@ usage() {
 }
 
 cleanup() {
-  rm -f  "${SCRIPT_DIR}/_service_env.sh"
-  rm -rf "${REPO_ROOT}/local_deps"
-  rm -f  "${REPO_ROOT}/adapters.requirements.txt"
+  rm -f "${SCRIPT_DIR}/_service_env.sh"
+  rm -f "${REPO_ROOT}/adapters.requirements.txt"
+  # Remove package subdirs staged by this build. Skip dotfiles so .gitignore
+  # inside local_deps/ is never touched, keeping the directory git-tracked.
+  find "${REPO_ROOT}/local_deps" -mindepth 1 -maxdepth 1 \
+    -not -name ".*" -exec rm -rf {} +
 }
 
 # ---------------------------------------------------------------------------
@@ -133,6 +136,10 @@ for SERVICE_FILE in "${SERVICE_FILES[@]}"; do
   log "Processing service file: ${SERVICE_FILE}"
   log "============================================================"
 
+  # Ensure local_deps/ exists (it is git-tracked via its .gitignore, but may
+  # have been absent if this is a fresh clone with no prior build run).
+  mkdir -p "${REPO_ROOT}/local_deps"
+
   # Parse the service file. For local-path deps this also copies source trees
   # into <repo_root>/local_deps/ so they are inside the Docker build context.
   python3 "${SCRIPT_DIR}/parse_service.py" \
@@ -150,9 +157,11 @@ for SERVICE_FILE in "${SERVICE_FILES[@]}"; do
   log "REPO_URL   : ${SVC_REPO_URL}"
   log "GIT_BRANCH : ${SVC_GIT_BRANCH}"
 
-  if [[ -d "${REPO_ROOT}/local_deps" ]]; then
+  # List staged local packages (exclude dotfiles like .gitignore)
+  LOCAL_PKGS=$(find "${REPO_ROOT}/local_deps" -mindepth 1 -maxdepth 1 -not -name ".*" -type d 2>/dev/null || true)
+  if [[ -n "${LOCAL_PKGS}" ]]; then
     log "Local deps staged into build context:"
-    ls "${REPO_ROOT}/local_deps/" | sed 's/^/    /'
+    echo "${LOCAL_PKGS}" | xargs -I{} basename {} | sed 's/^/    /'
   fi
 
   log "Generated adapters.requirements.txt:"
@@ -203,7 +212,8 @@ for SERVICE_FILE in "${SERVICE_FILES[@]}"; do
     fi
   fi
 
-  # Clean up per-build artifacts (local_deps, requirements, temp env)
+  # Clean up per-build temp files. local_deps/ itself and its dotfiles are
+  # preserved so subsequent builds can still COPY it cleanly.
   cleanup
 done
 

@@ -3,9 +3,6 @@
 parse_service.py — Parses an OpenG2P service spec file and emits a shell-sourceable
 env file plus the adapters.requirements.txt consumed by the Dockerfiles.
 
-This is a direct Python equivalent of the "Read service file and prepare adapters
-requirements" step in docker-build.yml.
-
 Supports two dependency syntaxes in the service spec file:
 
   Remote (fetched from GitHub at pip-install time):
@@ -19,9 +16,9 @@ Supports two dependency syntaxes in the service spec file:
     ./local_deps/<dir_name>
   so pip installs it from the local source tree rather than fetching from GitHub.
 
-  local_deps/ is committed to git (with a .gitkeep placeholder) so that the
-  Dockerfiles can unconditionally COPY it in both local and GitHub Actions builds.
-  This script only writes into local_deps/ — it never deletes the directory itself.
+  local_deps/ is a git-tracked directory (via local_deps/.gitignore which ignores
+  its own contents). build.sh ensures it exists before each docker build.
+  The Dockerfiles unconditionally COPY it — works in both local and CI builds.
 
 Usage (called by build.sh, but can also be run directly):
     python3 parse_service.py \\
@@ -56,9 +53,6 @@ def _resolve_local_dep(val: str, repo_root: str) -> tuple[str, str]:
 
     Copy that directory into <repo_root>/local_deps/<dir_name>/ so it sits inside
     the Docker build context, and return (pip_requirement_line, dir_name).
-
-    The pip requirement line will be  ./local_deps/<dir_name>
-    which pip can install as a local package.
     """
     src = os.path.abspath(val.strip())
     pkg_name = os.path.basename(src)
@@ -69,7 +63,7 @@ def _resolve_local_dep(val: str, repo_root: str) -> tuple[str, str]:
         print(f"ERROR: Local dependency path does not exist: {src}", file=sys.stderr)
         sys.exit(1)
 
-    # Refresh only this package's subdirectory — never touch .gitkeep or other entries
+    # Refresh only this package's subdirectory
     if os.path.exists(dest):
         shutil.rmtree(dest)
     print(f"  [local] Copying {src}  →  local_deps/{pkg_name}/")
@@ -80,15 +74,15 @@ def _resolve_local_dep(val: str, repo_root: str) -> tuple[str, str]:
 
 def _clean_stale_local_deps(repo_root: str, current_pkgs: list[str]):
     """
-    Remove any subdirectories from local_deps/ that are not in current_pkgs.
-    This clears leftovers from a previous build without touching .gitkeep.
+    Remove subdirectories from local_deps/ that are not in current_pkgs.
+    Skips dotfiles (e.g. .gitignore) so git-tracked files are never touched.
     """
     local_deps_root = os.path.join(repo_root, "local_deps")
     if not os.path.exists(local_deps_root):
         return
     for entry in os.listdir(local_deps_root):
-        if entry == ".gitkeep":
-            continue
+        if entry.startswith("."):
+            continue  # never touch .gitignore or any other dotfile
         if entry not in current_pkgs:
             stale = os.path.join(local_deps_root, entry)
             if os.path.isdir(stale):
@@ -120,7 +114,7 @@ def parse_service_file(service_file: str, override_dockerfile: str | None, repo_
     image_id = lines[0].lstrip("#!").strip()
 
     # -----------------------------------------------------------------------
-    # Dockerfile resolution (mirrors workflow logic)
+    # Dockerfile resolution
     # -----------------------------------------------------------------------
     dockerfile = override_dockerfile or ""
 
@@ -142,10 +136,16 @@ def parse_service_file(service_file: str, override_dockerfile: str | None, repo_
         sys.exit(1)
 
     # -----------------------------------------------------------------------
+    # Ensure local_deps/ exists (build.sh also does this, but belt-and-suspenders)
+    # -----------------------------------------------------------------------
+    local_deps_root = os.path.join(repo_root, "local_deps")
+    os.makedirs(local_deps_root, exist_ok=True)
+
+    # -----------------------------------------------------------------------
     # Dependency / git line parsing
     # -----------------------------------------------------------------------
-    deps = []        # lines written to adapters.requirements.txt
-    local_pkgs = []  # package names sourced locally (for stale-cleanup + logging)
+    deps = []
+    local_pkgs = []
     repo_url = ""
     git_branch = ""
 
@@ -156,23 +156,18 @@ def parse_service_file(service_file: str, override_dockerfile: str | None, repo_
         if not val:
             continue
 
-        # ------------------------------------------------------------------
-        # Case 1: local path  (/abs/path/to/package  or  ./rel/path)
-        # ------------------------------------------------------------------
+        # Case 1: local path
         if _is_local_path(val):
             pip_line, pkg_name = _resolve_local_dep(val, repo_root)
             deps.append(pip_line)
             local_pkgs.append(pkg_name)
             continue
 
-        # ------------------------------------------------------------------
-        # Case 2: remote git dep   git://TAG//URL[#subdirectory=...]
-        # ------------------------------------------------------------------
+        # Case 2: remote git dep
         m = re.match(r"git://([^/]+)//(.+)", val)
         if m:
             tag = m.group(1)
             url_full = m.group(2)
-            # Capture first remote git dep as primary repo/branch for Dockerfile ARGs
             if not repo_url:
                 repo_url = url_full.split("#")[0] if "#" in url_full else url_full
                 git_branch = tag
@@ -183,16 +178,14 @@ def parse_service_file(service_file: str, override_dockerfile: str | None, repo_
                 deps.append(f"git+{url_full}@{tag}")
             continue
 
-        # ------------------------------------------------------------------
-        # Case 3: plain pip requirement  (e.g. requests==2.31.0)
-        # ------------------------------------------------------------------
+        # Case 3: plain pip requirement
         deps.append(val)
 
-    # Remove any leftover subdirs from a previous build that aren't needed now
+    # Remove stale package dirs from a previous build (skips dotfiles)
     _clean_stale_local_deps(repo_root, local_pkgs)
 
     # -----------------------------------------------------------------------
-    # Write adapters.requirements.txt into repo root (Dockerfiles COPY it)
+    # Write adapters.requirements.txt
     # -----------------------------------------------------------------------
     req_path = os.path.join(repo_root, "adapters.requirements.txt")
     with open(req_path, "w") as f:
@@ -233,7 +226,6 @@ def parse_service_file(service_file: str, override_dockerfile: str | None, repo_
 
     version = image_id.split(":")[-1] if ":" in image_id else "latest"
 
-    # Make dockerfile path absolute consistently
     if not os.path.isabs(dockerfile):
         dockerfile = os.path.join(repo_root, dockerfile)
     dockerfile = os.path.abspath(dockerfile)
@@ -257,7 +249,6 @@ def parse_service_file(service_file: str, override_dockerfile: str | None, repo_
 # ---------------------------------------------------------------------------
 
 def write_env_file(env_vars: dict, output_path: str):
-    """Write a shell-sourceable file with all derived variables."""
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as f:
         for key, value in env_vars.items():
