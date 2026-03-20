@@ -242,7 +242,7 @@ jobs:
           context: ${{ steps.read.outputs.context }}
           file: ${{ steps.read.outputs.dockerfile }}
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ${{ steps.read.outputs.image }}
           build-args: |
             REPO_URL=${{ steps.read.outputs.repo_url }}
