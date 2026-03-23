@@ -1,4 +1,4 @@
-#!openg2p/openg2p-farmer-registry-staff-portal-api:develop
+#!tahzeer/openg2p-farmer-registry-staff-portal-api:develop
 
 # Contents
 git://develop//https://github.com/openg2p/openg2p-registry-gen2-extensions#subdirectory=openg2p-registry-farmer-extension
@@ -10,5 +10,5 @@ git://v2.0.0//https://github.com/openg2p/openg2p-g2pconnect-common-lib#subdirect
 git://v2.0.0//https://github.com/openg2p/openg2p-g2pconnect-common-lib#subdirectory=openg2p-g2pconnect-mapper-lib
 
 # Core
-git://develop//https://github.com/openg2p/openg2p-registry-gen2-core#subdirectory=openg2p-registry-core
-git://develop//https://github.com/openg2p/openg2p-registry-gen2-apis#subdirectory=openg2p-registry-staff-portal-api
+git://develop//https://github.com/tahzeer/openg2p-registry-gen2-core#subdirectory=openg2p-registry-core
+git://develop//https://github.com/tahzeer/openg2p-registry-gen2-apis#subdirectory=openg2p-registry-staff-portal-api
