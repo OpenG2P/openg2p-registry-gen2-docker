@@ -10,6 +10,6 @@ git://v2.0.0//https://github.com/openg2p/openg2p-g2pconnect-common-lib#subdirect
 git://v2.0.0//https://github.com/openg2p/openg2p-g2pconnect-common-lib#subdirectory=openg2p-g2pconnect-mapper-lib
 
 # Core
-git://develop//https://github.com/psnappz/openg2p-iam-service#subdirectory=iam-core
+git://develop//https://github.com/openg2p/openg2p-iam-service#subdirectory=iam-core
 git://develop//https://github.com/tahzeer/openg2p-registry-gen2-core#subdirectory=openg2p-registry-core
 git://develop//https://github.com/tahzeer/openg2p-registry-gen2-apis#subdirectory=openg2p-registry-staff-portal-api
