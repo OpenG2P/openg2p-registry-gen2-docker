@@ -4,8 +4,8 @@ WORKDIR /app
 FROM base AS builder
 
 RUN apk add --no-cache git
-ARG REPO_URL=https://github.com/openg2p/openg2p-registry-staff-portal-ui
-ARG GIT_BRANCH=develop
+ARG REPO_URL
+ARG GIT_BRANCH
 RUN git clone --branch ${GIT_BRANCH} --depth 1 ${REPO_URL} .
 
 RUN npm ci
@@ -20,7 +20,7 @@ ENV HOSTNAME=0.0.0.0
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs \
- && adduser --system --uid 1001 nextjs
+    && adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
