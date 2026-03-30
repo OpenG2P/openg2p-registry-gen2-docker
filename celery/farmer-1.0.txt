@@ -3,7 +3,6 @@
 # Dependencies
 git://v1.1.5//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-common
 git://v1.1.5//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-auth
-git://v2.0.0//https://github.com/openg2p/openg2p-g2pconnect-common-lib#subdirectory=openg2p-g2pconnect-common-lib
 git://1.0//https://github.com/openg2p/openg2p-registry-gen2-core#subdirectory=openg2p-registry-core
 
 # Celery components - including both so this image can run as worker or beat
@@ -11,4 +10,5 @@ git://1.0//https://github.com/openg2p/openg2p-registry-gen2-celery#subdirectory=
 git://1.0//https://github.com/openg2p/openg2p-registry-gen2-celery#subdirectory=openg2p-registry-celery-workers
 
 # Domain specific
+git://1.0//https://github.com/openg2p/openg2p-iam-service#subdirectory=iam-core
 git://1.0//https://github.com/openg2p/openg2p-registry-gen2-extensions#subdirectory=openg2p-registry-farmer-extension
