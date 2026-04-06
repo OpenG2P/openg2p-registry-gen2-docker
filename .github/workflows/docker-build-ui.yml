@@ -4,10 +4,10 @@ on:
   workflow_dispatch: 
     inputs:
       service_file:
-        description: 'Path to the service spec file (e.g. staff-portal-ui/registry-core-ui.txt)'
+        description: 'Path to the service spec file (e.g. staff-portal-ui/registry-staff-portal-ui-v1.0.0.txt)'
         required: false
         type: string
-        default: 'staff-portal-ui/registry-core-ui.txt'
+        default: 'staff-portal-ui/registry-staff-portal-ui-v1.0.0.txt'
       dockerfile:
         description: 'Path to the Dockerfile (optional, defaults to Dockerfile in same dir)'
         required: false
