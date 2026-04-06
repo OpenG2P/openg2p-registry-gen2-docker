@@ -1,7 +1,17 @@
 name: Build & Push UI Dockers
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch: 
+    inputs:
+      service_file:
+        description: 'Path to the service spec file (e.g. staff-portal-ui/registry-core-ui.txt)'
+        required: false
+        type: string
+        default: 'staff-portal-ui/registry-core-ui.txt'
+      dockerfile:
+        description: 'Path to the Dockerfile (optional, defaults to Dockerfile in same dir)'
+        required: false
+        type: string
 
 jobs:
   docker-build:
