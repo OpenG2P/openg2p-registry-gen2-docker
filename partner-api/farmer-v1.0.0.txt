@@ -1,0 +1,7 @@
+#!openg2p/openg2p-farmer-registry-partner-api:1.0.0
+git://v1.1.6//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-common
+git://v1.1.6//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-auth
+git://v1.0.0//https://github.com/openg2p/openg2p-iam-service#subdirectory=iam-core
+git://v1.0.0//https://github.com/openg2p/openg2p-registry-gen2-core#subdirectory=openg2p-registry-core
+git://v1.0.0//https://github.com/openg2p/openg2p-registry-gen2-extensions#subdirectory=openg2p-registry-farmer-extension
+git://v1.0.0//https://github.com/openg2p/openg2p-registry-gen2-apis#subdirectory=openg2p-registry-partner-api
