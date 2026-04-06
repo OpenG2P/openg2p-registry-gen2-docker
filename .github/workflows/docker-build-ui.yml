@@ -59,9 +59,7 @@ jobs:
     name: Docker - ${{ matrix.name }}
     strategy:
       fail-fast: false
-      matrix:
-        fail-fast: false
-        matrix: ${{ fromJson(needs.setup.outputs.matrix)}}
+      matrix: ${{ fromJson(needs.setup.outputs.matrix)}}
 
     steps:
       - uses: actions/checkout@v4
