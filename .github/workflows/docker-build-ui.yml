@@ -1,18 +1,67 @@
 name: Build & Push UI Dockers
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch: 
+    inputs:
+      service_file:
+        description: 'Path to the service spec file (e.g. staff-portal-ui/registry-staff-portal-ui-v1.0.0.txt)'
+        required: false
+        type: string
+        default: 'staff-portal-ui/registry-staff-portal-ui-v1.0.0.txt'
+      dockerfile:
+        description: 'Path to the Dockerfile (optional, defaults to Dockerfile in same dir)'
+        required: false
+        type: string
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        shell: python
+        env:
+          INPUT_SERVICE_FILE: ${{ inputs.service_file }}
+          INPUT_DOCKERFILE: ${{ inputs.dockerfile }}
+        run: |
+          import os
+          import json
+          import sys
+
+          service_file = os.environ.get('INPUT_SERVICE_FILE', '').strip()
+          dockerfile = os.environ.get('INPUT_DOCKERFILE', '').strip()
+
+          matrix_include = []
+
+          if service_file:
+              # Manual run with specified file
+              name = os.path.basename(service_file).replace('.txt', '')
+              matrix_include.append({
+                  "name": name,
+                  "serviceFile": service_file,
+                  "dockerfile": dockerfile
+              })
+          else:
+              # Default fallback
+              matrix_include.append({
+                  "name": "staff-portal-ui",
+                  "serviceFile": "staff-portal-ui/registry-staff-portal-ui-v1.0.0.txt",
+                  "dockerfile": "staff-portal-ui/Dockerfile"
+              })
+             
+          matrix = {"include": matrix_include}
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            f.write(f"matrix={json.dumps(matrix)}\n")
+            
   docker-build:
+    needs: setup
     runs-on: ubuntu-latest
     name: Docker - ${{ matrix.name }}
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - name: registry-core-ui
-            serviceFile: staff-portal-ui/registry-core-ui.txt
+      matrix: ${{ fromJson(needs.setup.outputs.matrix)}}
 
     steps:
       - uses: actions/checkout@v4
