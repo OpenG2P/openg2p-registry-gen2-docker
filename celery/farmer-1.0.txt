@@ -1,14 +1,14 @@
-#!tahzeer/openg2p-farmer-registry-celery:1.0
+#!openg2p/openg2p-farmer-registry-celery:1.0
 
 # Dependencies
 git://1.1//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-common
 git://1.1//https://github.com/openg2p/openg2p-fastapi-common#subdirectory=openg2p-fastapi-auth
-git://1.0//https://github.com/tahzeer/openg2p-registry-gen2-core#subdirectory=openg2p-registry-core
+git://1.0//https://github.com/openg2p/openg2p-registry-gen2-core#subdirectory=openg2p-registry-core
 
 # Celery components - including both so this image can run as worker or beat
-git://1.0//https://github.com/tahzeer/openg2p-registry-gen2-celery#subdirectory=openg2p-registry-celery-beat-producers
-git://1.0//https://github.com/tahzeer/openg2p-registry-gen2-celery#subdirectory=openg2p-registry-celery-workers
+git://1.0//https://github.com/openg2p/openg2p-registry-gen2-celery#subdirectory=openg2p-registry-celery-beat-producers
+git://1.0//https://github.com/openg2p/openg2p-registry-gen2-celery#subdirectory=openg2p-registry-celery-workers
 
 # Domain specific
-git://1.0//https://github.com/tahzeer/openg2p-iam-service#subdirectory=iam-core
-git://1.0//https://github.com/tahzeer/openg2p-registry-gen2-extensions#subdirectory=openg2p-registry-farmer-extension
+git://1.0//https://github.com/openg2p/openg2p-iam-service#subdirectory=iam-core
+git://1.0//https://github.com/openg2p/openg2p-registry-gen2-extensions#subdirectory=openg2p-registry-farmer-extension
