@@ -1,0 +1,5 @@
+#!openg2p/openg2p-registry-staff-portal-ui:1.0.1
+
+# Contents
+git://v1.0.1//https://github.com/openg2p/openg2p-registry-gen2-staff-portal-ui
+
