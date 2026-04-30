@@ -11,4 +11,4 @@ git://develop//https://github.com/openg2p/openg2p-registry-gen2-celery#subdirect
 
 # Domain specific
 git://develop//https://github.com/openg2p/openg2p-iam-service#subdirectory=iam-core
-git+https://${OPENG2P_BOT_GITHUB_PAT}@github.com/openg2p/openg2p-registry-gen2-extensions@develop#subdirectory=openg2p-registry-farmer-extension
+git+https://${OPENG2P_BOT_GITHUB_PAT}@github.com/openg2p/openg2p-registry-nsr-extensions@develop#subdirectory=openg2p-registry-nsr-extension
