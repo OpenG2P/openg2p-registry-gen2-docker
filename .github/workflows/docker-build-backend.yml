@@ -74,6 +74,8 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     name: Docker - ${{ matrix.name }}
+    env:
+      OPENG2P_BOT_GITHUB_PAT: ${{ secrets.OPENG2P_BOT_GITHUB_PAT }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
@@ -245,6 +247,7 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.read.outputs.image }}
           build-args: |
+            OPENG2P_BOT_GITHUB_PAT=${{ secrets.OPENG2P_BOT_GITHUB_PAT }}
             REPO_URL=${{ steps.read.outputs.repo_url }}
             GIT_BRANCH=${{ steps.read.outputs.git_branch }}
           labels: |
