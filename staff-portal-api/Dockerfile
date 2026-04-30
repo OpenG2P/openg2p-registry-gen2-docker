@@ -3,6 +3,8 @@ FROM python:3.12.11-alpine3.22
 RUN apk add --no-cache --virtual .build-deps gcc libc-dev linux-headers make \
  && apk add --no-cache bash git gettext libpq-dev libmagic
 
+ARG OPENG2P_BOT_GITHUB_PAT
+
 WORKDIR /app
 
 # Copy local package sources (may be empty for remote-only builds)
